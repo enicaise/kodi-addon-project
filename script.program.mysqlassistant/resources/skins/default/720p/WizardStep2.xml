@@ -1,0 +1,67 @@
+# resources/skins/default/720p/WizardStep2.xml
+#  - Step 2: Server credentials and connection test
+<window>
+    <control type="label" id="1">
+        <posx>0</posx>
+        <posy>0</posy>
+        <width>1280</width>
+        <height>720</height>
+        <label>Enter MySQL Server Credentials</label>
+    </control>
+    <control type="editbox" id="2">
+        <posx>100</posx>
+        <posy>100</posy>
+        <width>200</width>
+        <height>50</height>
+        <label>Server Address:</label>
+    </control>
+    <control type="editbox" id="3">
+        <posx>100</posx>
+        <posy>200</posy>
+        <width>200</width>
+        <height>50</height>
+        <label>Username:</label>
+    </control>
+    <control type="editbox" id="4">
+        <posx>100</posx>
+        <posy>300</posy>
+        <width>200</width>
+        <height>50</height>
+        <label>Password:</label>
+    </control>
+    <control type="button" id="5">
+        <posx>100</posx>
+        <posy>400</posy>
+        <width>200</width>
+        <height>50</height>
+        <label>Test Connection</label>
+    </control>
+    <control type="button" id="6">
+        <posx>100</posx>
+        <posy>500</posy>
+        <width>200</width>
+        <height>50</height>
+        <label>Next Step</label>
+    </control>
+    <control type="button" id="7">
+        <posx>100</posx>
+        <posy>600</posy>
+        <width>200</width>
+        <height>50</height>
+        <label>Exit Wizard</label>
+    </control>
+    <control type="label" id="8">
+        <posx>0</posx>
+        <posy>700</posy>
+        <width>1280</width>
+        <height>50</height>
+        <label>Fill in the details to connect to your MySQL server.</label>
+    </control>
+    <control type="image" id="9">
+        <posx>0</posx>
+        <posy>0</posy>
+        <width>1280</width>
+        <height>720</height>
+        <texture>background.png</texture>
+    </control>
+</window>

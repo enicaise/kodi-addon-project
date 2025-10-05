@@ -1,0 +1,231 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: script.program.mysqlassistant\n"
+"Language: en_GB\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+msgctxt "#30010"
+msgid "Dependency missing"
+msgstr "Dependency missing"
+
+msgctxt "#30011"
+msgid "Please install a MySQL connector module."
+msgstr "Please install a MySQL connector module."
+
+msgctxt "#30012"
+msgid "No Kodi databases were found on the server."
+msgstr "No Kodi databases were found on the server."
+
+msgctxt "#30013"
+msgid "Database connection error"
+msgstr "Database connection error"
+
+msgctxt "#30014"
+msgid "Unable to create database cursor."
+msgstr "Unable to create database cursor."
+
+msgctxt "#30015"
+msgid "Error"
+msgstr "Error"
+
+msgctxt "#30016"
+msgid "Migration complete"
+msgstr "Migration complete"
+
+msgctxt "#30017"
+msgid "Imported data into {tables} tables."
+msgstr "Imported data into {tables} tables."
+
+msgctxt "#30018"
+msgid "Missing database name for migration."
+msgstr "Missing database name for migration."
+
+msgctxt "#30019"
+msgid "Could not locate the local SQLite library."
+msgstr "Could not locate the local SQLite library."
+
+msgctxt "#30020"
+msgid "Missing MySQL connection details: {fields}"
+msgstr "Missing MySQL connection details: {fields}"
+
+msgctxt "#30021"
+msgid "Invalid MySQL port value."
+msgstr "Invalid MySQL port value."
+
+msgctxt "#30022"
+msgid "SQLite source not found: {path}"
+msgstr "SQLite source not found: {path}"
+
+msgctxt "#30023"
+msgid "MySQL connection failed: {error}"
+msgstr "MySQL connection failed: {error}"
+
+msgctxt "#30024"
+msgid "Unexpected migration error: {error}"
+msgstr "Unexpected migration error: {error}"
+
+msgctxt "#30025"
+msgid "Port error"
+msgstr "Port error"
+
+msgctxt "#30026"
+msgid "The MySQL port must be a number."
+msgstr "The MySQL port must be a number."
+
+msgctxt "#30027"
+msgid "Missing information"
+msgstr "Missing information"
+
+msgctxt "#30028"
+msgid "Please provide: {fields}"
+msgstr "Please provide: {fields}"
+
+msgctxt "#30029"
+msgid "Connection failed"
+msgstr "Connection failed"
+
+msgctxt "#30030"
+msgid "Unable to connect to the database server. Please verify the details."
+msgstr "Unable to connect to the database server. Please verify the details."
+
+msgctxt "#30032"
+msgid "Failed to save configuration"
+msgstr "Failed to save configuration"
+
+msgctxt "#30033"
+msgid "Kodi will use the new settings on next start."
+msgstr "Kodi will use the new settings on next start."
+
+msgctxt "#30034"
+msgid "Server discovery"
+msgstr "Server discovery"
+
+msgctxt "#30035"
+msgid "Scan local network"
+msgstr "Scan local network"
+
+msgctxt "#30036"
+msgid "Enter connection manually"
+msgstr "Enter connection manually"
+
+msgctxt "#30037"
+msgid "Select MySQL server"
+msgstr "Select MySQL server"
+
+msgctxt "#30038"
+msgid "No servers were detected. Please enter the connection manually."
+msgstr "No servers were detected. Please enter the connection manually."
+
+msgctxt "#30039"
+msgid "Enter the MySQL server address"
+msgstr "Enter the MySQL server address"
+
+msgctxt "#30040"
+msgid "Enter the MySQL server port"
+msgstr "Enter the MySQL server port"
+
+msgctxt "#30041"
+msgid "Enter the MySQL username"
+msgstr "Enter the MySQL username"
+
+msgctxt "#30042"
+msgid "Enter the MySQL password"
+msgstr "Enter the MySQL password"
+
+msgctxt "#30043"
+msgid "This value is required."
+msgstr "This value is required."
+
+msgctxt "#30044"
+msgid "Video database name"
+msgstr "Video database name"
+
+msgctxt "#30045"
+msgid "Configure the video library?"
+msgstr "Configure the video library?"
+
+msgctxt "#30046"
+msgid "Music database name"
+msgstr "Music database name"
+
+msgctxt "#30047"
+msgid "Configure the music library?"
+msgstr "Configure the music library?"
+
+msgctxt "#30048"
+msgid "You need to configure at least one library."
+msgstr "You need to configure at least one library."
+
+msgctxt "#30049"
+msgid "Select data to migrate"
+msgstr "Select data to migrate"
+
+msgctxt "#30050"
+msgid "Video library"
+msgstr "Video library"
+
+msgctxt "#30051"
+msgid "Music library"
+msgstr "Music library"
+
+msgctxt "#30052"
+msgid "Import options"
+msgstr "Import options"
+
+msgctxt "#30053"
+msgid "Import watched state"
+msgstr "Import watched state"
+
+msgctxt "#30054"
+msgid "Import resume points"
+msgstr "Import resume points"
+
+msgctxt "#30055"
+msgid "Clean library after updates"
+msgstr "Clean library after updates"
+
+msgctxt "#30056"
+msgid "Setup complete"
+msgstr "Setup complete"
+
+msgctxt "#30057"
+msgid "Path to advancedsettings.xml:"
+msgstr "Path to advancedsettings.xml:"
+
+msgctxt "#30058"
+msgid "Host: {host}:{port}"
+msgstr "Host: {host}:{port}"
+
+msgctxt "#30059"
+msgid "Video database: {name}"
+msgstr "Video database: {name}"
+
+msgctxt "#30060"
+msgid "Music database: {name}"
+msgstr "Music database: {name}"
+
+msgctxt "#30061"
+msgid "Retry"
+msgstr "Retry"
+
+msgctxt "#30062"
+msgid "Cancel"
+msgstr "Cancel"
+
+msgctxt "#30065"
+msgid "Store the video library on {host}?"
+msgstr "Store the video library on {host}?"
+
+msgctxt "#30066"
+msgid "Store the music library on {host}?"
+msgstr "Store the music library on {host}?"
+
+msgctxt "#30068"
+msgid "Skip"
+msgstr "Skip"
+
+msgctxt "#30069"
+msgid "Configure"
+msgstr "Configure"

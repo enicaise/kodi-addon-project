@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<addon id="script.program.mysqlassistant"
+       name="MySQL Assistant"
+       version="1.0.0"
+       provider-name="Apalala">
+
+    <!-- Dépendance minimale à Kodi Python 3 -->
+    <requires>
+        <import addon="xbmc.python" version="3.0.0"/>
+    </requires>
+
+    <!-- Type d’extension : programme -->
+    <extension point="xbmc.python.script" library="default.py">
+        <provides>executable</provides>
+    </extension>
+
+    <!-- Métadonnées -->
+    <extension point="xbmc.addon.metadata">
+        <summary lang="en">Assistant for configuring Kodi with a shared MySQL library</summary>
+        <summary lang="fr">Assistant de configuration d'une bibliothèque partagée MySQL pour Kodi</summary>
+        <summary lang="nl">Assistent voor het instellen van een gedeelde MySQL-bibliotheek voor Kodi</summary>
+
+        <description lang="en">This tool helps you scan the network for MySQL servers, test the connection, configure the advancedsettings.xml file, and migrate your local video/music libraries to MySQL — all with a user-friendly wizard and multilingual support.</description>
+        <description lang="fr">Cet assistant vous aide à détecter les serveurs MySQL sur le réseau, tester la connexion, configurer le fichier advancedsettings.xml, et migrer vos bibliothèques vidéo/musique locales vers MySQL — le tout via une interface conviviale et multilingue.</description>
+        <description lang="nl">Deze assistent helpt bij het detecteren van MySQL-servers op het netwerk, test de verbinding, configureert het advancedsettings.xml-bestand en migreert uw lokale video/muziekbibliotheken naar MySQL — met een gebruiksvriendelijke interface en meertalige ondersteuning.</description>
+
+        <platform>all</platform>
+        <language>en fr nl</language>
+        <license>GPL-3.0-or-later</license>
+        <source>https://github.com/apalala/script.program.mysqlassistant</source>
+        <website>https://www.apalala.be</website>
+        <email>support@apalala.be</email>
+    </extension>
+</addon>

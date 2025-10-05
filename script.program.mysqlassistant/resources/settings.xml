@@ -1,0 +1,30 @@
+<settings>
+    <setting id="mysql_host" type="string" default="localhost">
+        <label>MySQL Host</label>
+        <description>Enter the hostname or IP address of the MySQL server.</description>
+    </setting>
+    <setting id="mysql_port" type="integer" default="3306">
+        <label>MySQL Port</label>
+        <description>Enter the port number for the MySQL server.</description>
+    </setting>
+    <setting id="mysql_user" type="string" default="">
+        <label>MySQL User</label>
+        <description>Enter the username for the MySQL database.</description>
+    </setting>
+    <setting id="mysql_password" type="string" default="">
+        <label>MySQL Password</label>
+        <description>Enter the password for the MySQL database user.</description>
+    </setting>
+    <setting id="mysql_database" type="string" default="">
+        <label>MySQL Database</label>
+        <description>Enter the name of the MySQL database to use.</description>
+    </setting>
+    <setting id="library_type" type="enum" default="video">
+        <label>Library Type</label>
+        <description>Select the type of library to configure.</description>
+        <options>
+            <option value="video">Video</option>
+            <option value="music">Music</option>
+        </options>
+    </setting>
+</settings>

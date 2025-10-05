@@ -1,0 +1,63 @@
+# resources/skins/default/720p/WizardStep3.xml
+#  - Step 3: Video/music DB configuration
+<window>
+    <control type="label" id="1">
+        <posx>0</posx>
+        <posy>0</posy>
+        <width>1280</width>
+        <height>720</height>
+        <label>Configure Video and Music Database</label>
+    </control>
+
+    <control type="editbox" id="2">
+        <posx>100</posx>
+        <posy>100</posy>
+        <width>200</width>
+        <height>50</height>
+        <label>Video Database Name:</label>
+    </control>
+
+    <control type="editbox" id="3">
+        <posx>100</posx>
+        <posy>200</posy>
+        <width>200</width>
+        <height>50</height>
+        <label>Music Database Name:</label>
+    </control>
+
+    <control type="button" id="4">
+        <posx>100</posx>
+        <posy>300</posy>
+        <width>200</width>  
+        <height>50</height>
+        <label>Save Configuration</label>
+    </control>
+    <control type="button" id="5">
+        <posx>100</posx>
+        <posy>400</posy>
+        <width>200</width>
+        <height>50</height>
+        <label>Next Step</label>
+    </control>
+    <control type="button" id="6">
+        <posx>100</posx>
+        <posy>500</posy>
+        <width>200</width>
+        <height>50</height>
+        <label>Exit Wizard</label>
+    </control>
+    <control type="label" id="7">
+        <posx>0</posx>
+        <posy>600</posy>
+        <width>1280</width>
+        <height>50</height>
+        <label>Configure your video and music database settings.</label>
+    </control>
+    <control type="image" id="8">
+        <posx>0</posx>
+        <posy>0</posy>
+        <width>1280</width>
+        <height>720</height>
+        <texture>background.png</texture>
+    </control>
+</window>
