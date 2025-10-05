@@ -27,6 +27,24 @@ MySQL Assistant (`script.program.mysqlassistant`) guides you through configuring
 5. Decide whether to migrate your existing local SQLite data and pick the import options (watched status, resume points, etc.).
 6. Review the completion summary. The generated `advancedsettings.xml` is stored in Kodi's profile directory and will take effect on the next Kodi restart.
 
+## Packaging for Kodi
+
+1. Update the version number in `script.program.mysqlassistant/addon.xml` so Kodi can recognise the release.
+2. (Optional) Remove development artefacts you do not want to ship (e.g. docs, test data). Everything that remains inside `script.program.mysqlassistant/` will end up in the package.
+3. From the project root (the directory that contains `script.program.mysqlassistant/`), create the zip:
+   - PowerShell (Windows/macOS/Linux):
+     ```powershell
+     Compress-Archive -Path script.program.mysqlassistant -DestinationPath script.program.mysqlassistant-<version>.zip -Force
+     ```
+   - Bash / zip:
+     ```bash
+     zip -r script.program.mysqlassistant-<version>.zip script.program.mysqlassistant
+     ```
+   The resulting archive must contain a top-level folder named `script.program.mysqlassistant` with `addon.xml`, `resources/`, etc.
+4. Copy the generated `script.program.mysqlassistant-<version>.zip` to your Kodi device.
+5. In Kodi, go to **Settings → Add-ons → Install from zip file**, browse to the archive, and confirm.
+6. Restart Kodi after installation so the new `advancedsettings.xml` is picked up if you generated one during setup.
+
 ## Notes
 - The assistant creates the MySQL schemas if they do not already exist.
 - Migration skips tables that are missing in the MySQL target, allowing you to bootstrap an empty schema first by letting Kodi start once with the new settings.
