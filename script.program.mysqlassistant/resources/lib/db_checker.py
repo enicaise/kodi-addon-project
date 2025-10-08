@@ -219,3 +219,4 @@ def execute_query(cursor, query: str, params: Optional[tuple] = None) -> Any:
         logging.error("Query execution failed: %s", exc)
         xbmcgui.Dialog().ok(ADDON.getLocalizedString(30015), str(exc))
         return None
+

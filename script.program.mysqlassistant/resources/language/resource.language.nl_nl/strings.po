@@ -229,3 +229,59 @@ msgstr "Skip"
 msgctxt "#30069"
 msgid "Configure"
 msgstr "Configure"
+msgctxt "#30070"
+msgid "Existing Kodi databases"
+msgstr "Existing Kodi databases"
+
+msgctxt "#30071"
+msgid "The following Kodi databases were detected:"
+msgstr "The following Kodi databases were detected:"
+
+msgctxt "#30072"
+msgid "Outdated Kodi databases were detected:"
+msgstr "Outdated Kodi databases were detected:"
+
+msgctxt "#30073"
+msgid "No Kodi databases were detected on this server."
+msgstr "No Kodi databases were detected on this server."
+
+msgctxt "#30074"
+msgid "Scanning network..."
+msgstr "Scanning network..."
+
+msgctxt "#30075"
+msgid "Scanning {host}:{port}"
+msgstr "Scanning {host}:{port}"
+
+msgctxt "#30076"
+msgid "Network scan cancelled."
+msgstr "Network scan cancelled."
+
+msgctxt "#30077"
+msgid "No servers were discovered on the network."
+msgstr "No servers were discovered on the network."
+
+msgctxt "#30078"
+msgid "Rescan network"
+msgstr "Rescan network"
+
+msgctxt "#30081"
+msgid "Existing MySQL configuration detected"
+msgstr "Existing MySQL configuration detected"
+
+msgctxt "#30082"
+msgid "Video library: {host}:{port} → {database}"
+msgstr "Video library: {host}:{port} → {database}"
+
+msgctxt "#30083"
+msgid "Music library: {host}:{port} → {database}"
+msgstr "Music library: {host}:{port} → {database}"
+
+msgctxt "#30084"
+msgid "Configuration file: {path}"
+msgstr "Configuration file: {path}"
+
+msgctxt "#30085"
+msgid "A MySQL configuration already exists. You can overwrite it or keep the current settings."
+msgstr "A MySQL configuration already exists. You can overwrite it or keep the current settings."
+

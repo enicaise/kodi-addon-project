@@ -3,14 +3,16 @@
 from __future__ import annotations
 
 import logging
-from typing import Any, Dict, List, Optional, Sequence
+import xml.etree.ElementTree as ET
+from typing import Any, Dict, List, Optional, Sequence, Tuple
 
 import xbmc
 import xbmcaddon
 import xbmcgui
+import xbmcvfs
 
 from resources.lib.config_writer import write_advancedsettings
-from resources.lib.db_checker import get_kodi_db_versions
+from resources.lib.db_checker import check_kodi_dbs, get_kodi_db_versions
 from resources.lib.migrator import migrate_music_library, migrate_video_library
 from resources.lib.scanner import scan_network, test_connection
 
@@ -36,33 +38,34 @@ def _get_keyboard_input(heading: str, default: str = "", hidden: bool = False) -
 
 def _select_mode() -> Optional[str]:
     dialog = xbmcgui.Dialog()
-    options = [
-        _localize(30035, "Scan local network"),
-        _localize(30036, "Enter connection manually"),
-    ]
+    options = [_localize(30035, "Scan local network"), _localize(30036, "Enter connection manually")]
     choice = dialog.select(_localize(30034, "Server discovery"), options)
     if choice == -1:
         return None
     return "scan" if choice == 0 else "manual"
 
 
-def _choose_server(servers: Sequence[Sequence[Any]]) -> Optional[Dict[str, Any]]:
+def _choose_server(
+    servers: Sequence[Tuple[str, int]],
+    allow_rescan: bool = False,
+) -> Optional[Dict[str, Any]]:
     dialog = xbmcgui.Dialog()
-    if servers:
-        entries = [f"{server[0]}:{server[1]}" for server in servers]
-        entries.append(_localize(30036, "Enter connection manually"))
-        selection = dialog.select(_localize(30037, "Select MySQL server"), entries)
-        if selection == -1:
-            return None
-        if selection < len(servers):
-            host, port = servers[selection]
-            return {"host": host, "port": port}
-    else:
-        dialog.ok(
-            _localize(30037, "Select MySQL server"),
-            _localize(30038, "No servers were detected. Please enter the connection manually."),
-        )
-    return {"host": "", "port": 3306}
+    entries = [f"{host}:{port}" for host, port in servers]
+    rescan_index = None
+    if allow_rescan:
+        rescan_index = len(entries)
+        entries.append(_localize(30078, "Rescan network"))
+    manual_index = len(entries)
+    entries.append(_localize(30036, "Enter connection manually"))
+    selection = dialog.select(_localize(30037, "Select MySQL server"), entries)
+    if selection == -1:
+        return None
+    if allow_rescan and selection == rescan_index:
+        return {"rescan": True}
+    if selection >= manual_index:
+        return {"host": "", "port": 3306}
+    host, port = servers[selection]
+    return {"host": host, "port": port}
 
 
 def _prompt_required_text(heading_id: int, fallback: str, default: str = "", hidden: bool = False) -> Optional[str]:
@@ -101,6 +104,32 @@ def _prompt_port(default: int) -> Optional[int]:
         dialog.ok(_localize(30025, "Port error"), _localize(30026, "The MySQL port must be a number."))
 
 
+def _scan_network_with_progress() -> Tuple[List[Tuple[str, int]], bool]:
+    progress = xbmcgui.DialogProgress()
+    title = _localize(30074, "Scanning network...")
+    progress.create(title)
+    cancelled = {"value": False}
+
+    def _update(current: int, total: int, host: str, port: int) -> bool:
+        percent = int((current / total) * 100) if total else 0
+        progress.update(
+            percent,
+            title,
+            _localize(30075, "Scanning {host}:{port}").format(host=host, port=port),
+        )
+        if progress.iscanceled():
+            cancelled["value"] = True
+            return True
+        return False
+
+    try:
+        servers = scan_network(progress_cb=_update)
+    finally:
+        progress.close()
+    unique_servers = list(dict.fromkeys(servers))
+    return unique_servers, cancelled["value"]
+
+
 def _collect_connection_details(mode: str) -> Optional[Dict[str, Any]]:
     dialog = xbmcgui.Dialog()
     last_host = ""
@@ -108,15 +137,33 @@ def _collect_connection_details(mode: str) -> Optional[Dict[str, Any]]:
     last_user = ""
     last_password = ""
 
+    cached_servers: List[Tuple[str, int]] = []
+    if mode == "scan":
+        cached_servers, cancelled = _scan_network_with_progress()
+        if cancelled and not cached_servers:
+            dialog.ok(_localize(30074, "Scanning network..."), _localize(30076, "Network scan cancelled."))
+        if not cached_servers:
+            dialog.ok(_localize(30074, "Scanning network..."), _localize(30077, "No servers were discovered on the network."))
+
     while True:
-        servers = scan_network() if mode == "scan" else []
-        choice = _choose_server(servers)
-        if choice is None:
-            return None
+        choice: Dict[str, Any]
+        if mode == "scan":
+            selection = _choose_server(cached_servers, allow_rescan=True)
+            if selection is None:
+                return None
+            if selection.get("rescan"):
+                cached_servers, cancelled = _scan_network_with_progress()
+                if cancelled and not cached_servers:
+                    dialog.ok(_localize(30074, "Scanning network..."), _localize(30076, "Network scan cancelled."))
+                if not cached_servers:
+                    dialog.ok(_localize(30074, "Scanning network..."), _localize(30077, "No servers were discovered on the network."))
+                continue
+            choice = selection
+        else:
+            choice = {"host": last_host, "port": last_port}
 
         host_default = choice.get("host", "") or last_host
         port_default = choice.get("port", 0) or last_port or 3306
-        user_default = last_user
 
         host = _prompt_required_text(30039, "Enter the MySQL server address", host_default)
         if host is None:
@@ -126,7 +173,7 @@ def _collect_connection_details(mode: str) -> Optional[Dict[str, Any]]:
         if port is None:
             return None
 
-        user = _prompt_required_text(30041, "Enter the MySQL username", user_default)
+        user = _prompt_required_text(30041, "Enter the MySQL username", last_user)
         if user is None:
             return None
 
@@ -138,13 +185,17 @@ def _collect_connection_details(mode: str) -> Optional[Dict[str, Any]]:
         if password is None:
             return None
 
-        if test_connection(host, port, user, password):
-            return {"host": host, "port": port, "user": user, "password": password}
-
         last_host = host
         last_port = port
         last_user = user
         last_password = password
+
+        if test_connection(host, port, user, password):
+            connection = {"host": host, "port": port, "user": user, "password": password}
+            if mode == "scan" and (host, port) not in cached_servers:
+                cached_servers.append((host, port))
+            _show_existing_kodi_databases(connection)
+            return connection
 
         retry = dialog.yesno(
             _localize(30029, "Connection failed"),
@@ -195,7 +246,10 @@ def _step_configure_databases(connection: Dict[str, Any]) -> Optional[Dict[str, 
     return result
 
 
-def _step_migration_options(video_section: Optional[Dict[str, Any]], music_section: Optional[Dict[str, Any]]) -> Optional[Dict[str, Any]]:
+def _step_migration_options(
+    video_section: Optional[Dict[str, Any]],
+    music_section: Optional[Dict[str, Any]],
+) -> Optional[Dict[str, Any]]:
     dialog = xbmcgui.Dialog()
     options: List[str] = []
     option_keys: List[str] = []
@@ -312,7 +366,105 @@ def _show_summary(
         dialog.ok(_localize(30056, "Setup complete"), text)
 
 
+def _load_existing_configuration() -> Optional[Dict[str, Any]]:
+    path = xbmcvfs.translatePath("special://profile/advancedsettings.xml")
+    if not xbmcvfs.exists(path):
+        return None
+    try:
+        fh = xbmcvfs.File(path)
+        raw = fh.read()
+        fh.close()
+    except Exception as exc:
+        logging.error("Failed to read existing advancedsettings.xml: %s", exc)
+        return None
+    if isinstance(raw, bytes):
+        raw = raw.decode("utf-8", errors="ignore")
+    try:
+        root = ET.fromstring(raw)
+    except Exception as exc:
+        logging.error("Failed to parse existing advancedsettings.xml: %s", exc)
+        return None
+
+    def _parse(tag: str) -> Optional[Dict[str, str]]:
+        node = root.find(tag)
+        if node is None:
+            return None
+        return {
+            "host": (node.findtext("host") or "").strip(),
+            "port": (node.findtext("port") or "").strip(),
+            "user": (node.findtext("user") or "").strip(),
+            "database": (node.findtext("name") or node.findtext("database") or "").strip(),
+        }
+
+    video_info = _parse("videodatabase")
+    music_info = _parse("musicdatabase")
+    if not video_info and not music_info:
+        return None
+    return {"path": path, "video": video_info, "music": music_info}
+
+
+def _show_existing_configuration_info(config: Dict[str, Any]) -> None:
+    lines = [_localize(30085, "A MySQL configuration already exists. You can overwrite it or keep the current settings."), ""]
+    path = config.get("path")
+    if path:
+        lines.append(_localize(30084, "Configuration file: {path}").format(path=path))
+    video = config.get("video")
+    if video:
+        lines.append(
+            _localize(30082, "Video library: {host}:{port} → {database}").format(
+                host=video.get("host") or "?",
+                port=video.get("port") or "?",
+                database=video.get("database") or "?",
+            )
+        )
+    music = config.get("music")
+    if music:
+        lines.append(
+            _localize(30083, "Music library: {host}:{port} → {database}").format(
+                host=music.get("host") or "?",
+                port=music.get("port") or "?",
+                database=music.get("database") or "?",
+            )
+        )
+    message = "\n".join(filter(None, lines))
+    dialog = xbmcgui.Dialog()
+    try:
+        dialog.textviewer(_localize(30081, "Existing MySQL configuration detected"), message)
+    except AttributeError:
+        dialog.ok(_localize(30081, "Existing MySQL configuration detected"), message)
+
+
+def _show_existing_kodi_databases(connection: Dict[str, Any]) -> None:
+    try:
+        result = check_kodi_dbs(
+            connection.get("host"),
+            connection.get("port"),
+            connection.get("user"),
+            connection.get("password"),
+        )
+    except Exception as exc:
+        logging.error("Failed to inspect Kodi databases: %s", exc)
+        return
+
+    dialog = xbmcgui.Dialog()
+    title = _localize(30070, "Existing Kodi databases")
+    if "incompatible" in result:
+        lines = [_localize(30072, "Outdated Kodi databases were detected:"), ""]
+        lines.extend(f"{db} (v{version})" for db, version in result["incompatible"].items())
+        dialog.ok(title, "\n".join(lines))
+    elif "compatible" in result:
+        lines = [_localize(30071, "The following Kodi databases were detected:"), ""]
+        lines.extend(f"{db} (v{version})" for db, version in result["compatible"].items())
+        dialog.ok(title, "\n".join(lines))
+    elif "error" in result:
+        dialog.ok(title, result["error"] or _localize(30073, "No Kodi databases were detected on this server."))
+
+
 def main() -> None:
+    existing_config = _load_existing_configuration()
+    if existing_config:
+        _show_existing_configuration_info(existing_config)
+
     mode = _select_mode()
     if not mode:
         return
@@ -344,3 +496,5 @@ if __name__ == "__main__":
     xbmc.log("MySQL Assistant started", xbmc.LOGINFO)
     main()
     xbmc.log("MySQL Assistant finished", xbmc.LOGINFO)
+
+

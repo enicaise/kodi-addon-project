@@ -1,92 +1,81 @@
-### Structure initiale du projet Kodi Addon: script.program.mysqlassistant
+"""Network discovery helpers for MySQL Assistant."""
 
-# default.py
-# Entry point of the addon, routes actions and starts the wizard UI.
+from __future__ import annotations
 
-# addon.xml
-# Kodi addon manifest, defines metadata and entry script.
-
-# scanner.py
-"""
-This module discovers available MySQL servers on the local network.
-It scans the subnet defined by Kodi's IP and netmask and checks for open port 3306.
-Provides a fallback method for manual server entry and credential testing.
-Exports:
-- scan_network() -> List[Tuple[str, int]]: returns list of discovered servers
-- test_connection(host: str, port: int, user: str, password: str) -> bool
-"""
-import socket
 import ipaddress
 import logging
+import socket
+from typing import Callable, Iterable, List, Optional, Sequence, Tuple
 
 try:
-    import mysql.connector
-except ImportError:
-    mysql = None
+    import mysql.connector  # type: ignore
+except ImportError:  # pragma: no cover - optional dependency inside Kodi
+    mysql = None  # type: ignore
+
+ProgressCallback = Callable[[int, int, str, int], bool]
+DEFAULT_PORTS: Tuple[int, int] = (3306, 3307)
 
 
-def scan_network(timeout: float = 1.0) -> list:
-    """
-    Scans the local network for MySQL servers on port 3306.
-
-    Args:
-        timeout: socket timeout in seconds.
-
-    Returns:
-        List of (ip, port) tuples for reachable MySQL servers.
-    """
-    # Determine local network from host IP
+def scan_network(
+    timeout: float = 1.0,
+    ports: Sequence[int] = DEFAULT_PORTS,
+    progress_cb: Optional[ProgressCallback] = None,
+) -> List[Tuple[str, int]]:
+    """Scan the local /24 subnet for reachable MySQL/MariaDB servers."""
     try:
         local_ip = socket.gethostbyname(socket.gethostname())
         subnet = ipaddress.IPv4Network(f"{local_ip}/24", strict=False)
-    except Exception as e:
-        logging.error(f"Invalid local network: {e}")
+    except Exception as exc:
+        logging.error("Invalid local network: %s", exc)
         return []
 
-    servers = []
-    for ip in subnet.hosts():
-        try:
-            with socket.create_connection((str(ip), 3306), timeout=timeout):
-                servers.append((str(ip), 3306))
-        except Exception:
-            continue
-    return servers
+    hosts: List[str] = [str(ip) for ip in subnet.hosts()]
+    ports_to_check: Tuple[int, ...] = tuple(dict.fromkeys(int(port) for port in ports if port))
+    total_targets = max(1, len(hosts) * max(1, len(ports_to_check)))
+    checked = 0
+    discovered: List[Tuple[str, int]] = []
+
+    for host in hosts:
+        for port in ports_to_check:
+            checked += 1
+            if progress_cb and progress_cb(checked, total_targets, host, port):
+                return discovered
+            try:
+                with socket.create_connection((host, port), timeout=timeout):
+                    discovered.append((host, port))
+            except Exception:
+                continue
+    return discovered
 
 
-def test_connection(host: str, port: int, user: str, password: str, database: str = None) -> bool:
-    """
-    Tests connection to MySQL server with given credentials.
-    If mysql.connector is unavailable, falls back to basic socket check.
-
-    Args:
-        host: server IP or hostname
-        port: server port
-        user: username
-        password: password
-        database: optional database name to connect to
-
-    Returns:
-        True if connection and simple query succeed, False otherwise.
-    """
+def test_connection(
+    host: str,
+    port: int,
+    user: str,
+    password: str,
+    database: Optional[str] = None,
+) -> bool:
+    """Validate connectivity to the server using either mysql.connector or sockets."""
     if mysql:
         try:
-            conn_params = {'host': host, 'port': port, 'user': user, 'password': password}
+            conn_params = {"host": host, "port": port, "user": user, "password": password}
             if database:
-                conn_params['database'] = database
+                conn_params["database"] = database
             conn = mysql.connector.connect(**conn_params)
             cursor = conn.cursor()
-            cursor.execute('SELECT 1')
+            cursor.execute("SELECT 1")
             cursor.close()
             conn.close()
             return True
-        except Exception as e:
-            logging.error(f"MySQL auth failed: {e}")
+        except Exception as exc:  # pragma: no cover - connector feedback from Kodi
+            logging.error("MySQL authentication failed: %s", exc)
             return False
-    # Fallback: simple socket-based reachability
+
     try:
         with socket.create_connection((host, port), timeout=2):
             return True
-    except Exception as e:
-        logging.error(f"Socket test failed: {e}")
+    except Exception as exc:
+        logging.error("Socket reachability test failed: %s", exc)
         return False
+
 

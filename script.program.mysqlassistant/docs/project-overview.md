@@ -6,7 +6,7 @@ MySQL Assistant (`script.program.mysqlassistant`) guides Kodi users through conf
 ## High-level Architecture
 - **Entry point**: `default.py` orchestrates a dialogue-driven wizard using Kodi's built-in dialog API (`xbmcgui.Dialog`).
 - **Support modules**:
-  - `resources/lib/scanner.py` – scans the local /24 subnet for MySQL/MariaDB servers and validates credentials.
+  - `resources/lib/scanner.py` - scans the local /24 subnet for MySQL/MariaDB servers on ports 3306/3307 with progress feedback and credential testing.
   - `resources/lib/config_writer.py` – generates `advancedsettings.xml` in Kodi's profile directory using standard `<videodatabase>` / `<musicdatabase>` nodes.
   - `resources/lib/db_checker.py` – inspects remote servers for Kodi databases and compares schema versions against the running Kodi build.
   - `resources/lib/migrator.py` – migrates tables from the local SQLite databases into the chosen MySQL schemas, creating the schemas when needed.
@@ -15,13 +15,13 @@ MySQL Assistant (`script.program.mysqlassistant`) guides Kodi users through conf
 
 ## Runtime Flow (`default.py`)
 1. **Mode selection** – the user chooses between scanning the local network or entering connection details manually.
-2. **Credentials** – the wizard gathers host, port, username, and password, retrying until a connection is confirmed.
+2. **Credentials** - a cancellable scan discovers servers (ports 3306/3307), then the assistant gathers host/port/user/password and surfaces any existing Kodi databases on the target server.
 3. **Database selection** – suggested database names are derived from the current Kodi version; the user can enable video, music, or both.
 4. **Migration options** – optional migration of video/music data plus toggles for importing watched states, resume points, and cleaning libraries.
 5. **Finalisation** – migrations run (if selected), `advancedsettings.xml` is generated in `special://profile`, and a summary dialog lists the resulting configuration.
 
 ## Module Notes
-- `scanner.py` currently scans synchronously and assumes IPv4; large networks may take noticeable time.
+- `scanner.py` scans the /24 subnet synchronously (IPv4) with a progress dialog; very large networks may still take noticeable time.
 - `config_writer.py` writes Kodi-compliant database sections and optional library import flags, logging the output path.
 - `db_checker.py` maps Kodi releases to the expected MySQL schema versions (Omega/Nexus/Matrix/Leia) to detect outdated databases.
 - `migrator.py` uses `INSERT IGNORE` semantics to avoid duplicate key failures and skips tables missing on the MySQL side (allowing Kodi to bootstrap schemas first).
@@ -31,7 +31,7 @@ All user-facing text is routed through localisation IDs (30010–30069). English
 
 ## Dependencies
 - Kodi Python API modules: `xbmc`, `xbmcaddon`, `xbmcgui`, `xbmcvfs`.
-- Python MySQL connector inside Kodi's Python environment: `mysql-connector-python` (preferred) or `PyMySQL`.
+- Python MySQL connector inside Kodi's Python environment: provided automatically via the script.module.mysqlclient dependency (PyMySQL).
 - Standard library modules: `socket`, `ipaddress`, `logging`, `sqlite3`, `xml.etree.ElementTree`, `glob`, etc.
 
 ## Data Inputs and Outputs
@@ -50,3 +50,4 @@ All user-facing text is routed through localisation IDs (30010–30069). English
 - Allow chunked migration to reduce memory usage on very large tables.
 - Offer optional backup/export of the local SQLite databases before migration.
 - Detect and warn about mismatched character sets or collation settings on the target server.
+

@@ -5,6 +5,7 @@ MySQL Assistant (`script.program.mysqlassistant`) guides you through configuring
 ## Features
 - **Guided setup** – interactive dialogs collect server credentials, database names, and migration preferences.
 - **Network discovery** – scan the local subnet for accessible MySQL/MariaDB servers.
+**Existing configuration awareness** - highlight any current Kodi MySQL settings and detected server databases before applying changes.
 - **Validation** – optional inspection of existing Kodi databases to ensure version compatibility.
 - **Migration** – copy video and music data from the local SQLite files into the selected MySQL schemas.
 - **Configuration generation** – write a standards-compliant `advancedsettings.xml` in the Kodi profile folder.
@@ -12,7 +13,7 @@ MySQL Assistant (`script.program.mysqlassistant`) guides you through configuring
 ## Requirements
 - Kodi 19 (Matrix) or later with Python 3 support.
 - A reachable MySQL or MariaDB server with privileges to create databases and tables.
-- One of the Python connectors available inside Kodi's Python environment (`mysql-connector-python` or `PyMySQL`).
+- The dependency `script.module.mysqlclient` (PyMySQL) is listed in `addon.xml`; Kodi will auto-install it from the official repository. 
 
 ## Installation
 1. Copy the `script.program.mysqlassistant` directory into your Kodi add-ons folder (e.g. `~/.kodi/addons/`).
@@ -55,3 +56,4 @@ Bug reports and pull requests are welcome. Please make sure any new localisation
 
 ## Licence
 This project is released under the MIT Licence.
+

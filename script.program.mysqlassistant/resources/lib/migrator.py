@@ -247,3 +247,4 @@ def _build_insert_sql(table: str, columns: Iterable[str]) -> str:
 
 
 
+
